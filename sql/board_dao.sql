@@ -46,7 +46,7 @@ commit;
  
  
  
- 
+ select * from member;
  select no, title, content, member_no from board where no=1;
  
  

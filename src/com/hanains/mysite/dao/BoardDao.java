@@ -31,7 +31,7 @@ public class BoardDao {
 		return connection;
 	}
 
-	// 글 목록
+	// 글목록
 	public List<List<Object>> getList(){
 		
 		List<List<Object>> writelist=new ArrayList<>();
@@ -155,5 +155,26 @@ public class BoardDao {
 		}
 		
 		return vo;
+	}
+
+	// 글삭제
+	public void delete(Long no, Long member_no){
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=getConnection();
+			
+			String sql="delete from board where no=? and member_no=?";
+			
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setLong(1, no);
+			pstmt.setLong(2, member_no);
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 }
