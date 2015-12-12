@@ -33,7 +33,7 @@
 				</table>
 				<div class="bottom">
 					<a href="/mysite/board?a=list">글목록</a>
-					<a href="">글수정</a>
+					<a href="/mysite/board?a=modifyform&no=${writing.no }">글수정</a>
 				</div>
 			</div>
 		</div>

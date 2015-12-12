@@ -32,7 +32,7 @@
 		<div id="content">
 			<div id="board">
 				<form id="search_form" action="" method="post">
-					<input type="text" id="kwd" name="kwd" value="">
+					<input type="text" id="kwd" name="kwd" value="${word }">
 					<input type="submit" value="찾기">
 				</form>
 				<table class="tbl-ex">
@@ -54,30 +54,52 @@
 					</c:otherwise>
 				</c:choose>
 				
-				<c:set var="countTotal" value="${fn:length(list) }"/>
-				<c:forEach items="${list }" varStatus="i">
+				<c:set var="countTotal" value="${totalCount}"/>  <%-- 게시글 갯수 --%>
+				
+				<c:forEach items="${list }" var="list" varStatus="i">
 						<tr>
-							<td>${countTotal-i.index}</td> <!-- 글번호 -->
-							<td><a href="/mysite/board?a=view&no=${list.get(i.index).get(0)}">${list.get(i.index).get(1)}</a></td> <!-- 글제목 -->
-							<td>${list.get(i.index).get(3)}</td> <!-- 글쓴이 -->
-							<td>${list.get(i.index).get(4)}</td> <!-- 조회수 -->
-							<td>${list.get(i.index).get(5)}</td> <!-- 등록일 -->
+							<td>${countTotal-(pageSize*(nowPage-1))}</td> <!-- 글번호 -->
+							<td><a href="/mysite/board?a=view&no=${list.no}">${list.title}</a></td> <!-- 글제목 -->
+							<td>${list.member_name}</td> <!-- 글쓴이 -->
+							<td>${list.view_cnt}</td> <!-- 조회수 -->
+							<td>${list.reg_date}</td> <!-- 등록일 -->
 							
 							<td><a href="#" class="del" 
-									onclick="return deleteOK(${list.get(i.index).get(0)}, ${list.get(i.index).get(2)}, ${loginMember_no})">삭제</a></td>
+									onclick="return deleteOK(${list.no}, ${list.member_no}, ${loginMember_no})">삭제</a></td>
 						</tr>
+						
+						<c:set var="countTotal" value="${countTotal-1}"/>
 				</c:forEach>
 								
+				
 				</table>
 				<div class="pager">
 					<ul>
-						<li class="pg-prev"><a href="#">◀ 이전</a></li>
-						<li><a href="#">1</a></li>
-						<li><a href="#">2</a></li>
-						<li><a href="#">3</a></li>
-						<li class="disable">4</li>
-						<li class="disable">5</li>
-						<li class="pg-next"><a href="#">다음 ▶</a></li>
+						
+						<c:set var="p" value="${temp }"/> <%-- 페이지바 시작 번호 --%>
+						
+						<c:if test="${p!=1}">
+								<li class="pg-prev"><a href="/mysite/board?page=${p-1}&word="${kwd }">◀ 이전</a></li>
+						</c:if>
+						
+						<c:forEach begin="1" end="${totalPage}" var="i">
+							<c:if test="${!(i > blockSize || p > totalPage) }">
+								<c:choose> 
+									<c:when test="${p!=nowPage }" > <%-- 현재 페이지가 아닐 경우 링크걸기 --%>
+										<li><a href="/mysite/board?page=${p}&word="${kwd }>${p}</a></li>
+									</c:when>
+									<c:otherwise> <%-- 현재 페이지이면 색 주기 --%>
+										<li><b>${p}</b></li>
+									</c:otherwise>
+								</c:choose>
+								<c:set var="p" value="${p+1}"/>
+							</c:if>
+						</c:forEach>
+						
+						<c:if test="${p <= totalPage}">
+								<li class="pg-next"><a href="/mysite/board?page=${p}&word="${kwd }">다음 ▶</a></li>
+						</c:if>
+						
 					</ul>	
 				</div>
 				<div class="bottom">

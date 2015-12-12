@@ -9,6 +9,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.hanains.mysite.vo.BoardListVo;
 import com.hanains.mysite.vo.BoardVo;
 
 public class BoardDao {
@@ -30,11 +31,69 @@ public class BoardDao {
 		
 		return connection;
 	}
+	
+	// 검색 + 페이징 적용 글목록
+	public List<BoardListVo> getList(boolean search, String word, int start, int end, int pageSize) {
 
-	// 글목록
-	public List<List<Object>> getList(){
+		List<BoardListVo> list = new ArrayList<BoardListVo>();
+
+		Connection conn=null;
+		Statement stmt=null;
+		ResultSet rs=null;
 		
-		List<List<Object>> writelist=new ArrayList<>();
+		try {
+			conn=getConnection();
+			
+			String where = "";
+
+			if (search) {
+				where = " and (title like '%%"+word+"%%' or member_name like '%%"+word+"%%') " ;
+			}
+			
+			String sql="select * from"
+					+ "(select b.*, rownum as rnum from"
+					+ "( select * from"
+					+ "( select a.no, a.title, a.member_no, b.name as member_name, a.view_cnt, to_char(a.reg_date, 'yyyy-mm-dd hh:mi:ss') as reg_date "
+					+ "from board a, member b where a.member_no = b.no order by a.reg_date desc))b "
+					+ "ORDER BY b.reg_date desc) where rnum>="+start+" and rnum<="+end+where;
+			
+			stmt=conn.createStatement();
+			rs=stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				//레코드 1줄 -> BoardDTO 1개
+				BoardListVo vo = new BoardListVo();
+				
+				vo.setNo(rs.getLong(1));
+				vo.setTitle(rs.getString(2));
+				vo.setMember_no(rs.getLong(3));
+				vo.setMember_name(rs.getString(4));
+				vo.setView_cnt(rs.getLong(5));
+				vo.setReg_date(rs.getString(6));
+				
+				list.add(vo);
+			}
+
+		} catch (SQLException e) {
+			System.out.println("에러 - "+e);
+		} finally {
+			try {
+				
+				if (rs != null) rs.close();
+				if (stmt != null) stmt.close();
+				if (conn != null) conn.close();
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return list;
+	}
+	
+	// 검색+전체 글목록
+	public List<BoardListVo> getList(boolean search, String word){
+		
+		List<BoardListVo> list=new ArrayList<BoardListVo>();
 		
 		Connection conn=null;
 		Statement stmt=null;
@@ -44,14 +103,21 @@ public class BoardDao {
 			conn=getConnection();
 			stmt=conn.createStatement();
 			
+			String where = "";
+
+			if (search) {
+				where = "and (title like '%%"+word+"%%' or b.name like '%%"+word+"%%') " ;
+			}
+			
 			String sql="select a.no, a.title, a.member_no, b.name as member_name, a.view_cnt, to_char(a.reg_date, 'yyyy-mm-dd hh:mi:ss') "
-					+ "from board a, member b where a.member_no = b.no "
+					+ "from board a, member b "
+					+ "where a.member_no = b.no "+where
 					+ "order by a.reg_date desc";
 			
 			rs=stmt.executeQuery(sql);
 			
 			while(rs.next()){
-				List<Object> infolist=new ArrayList<>();
+				BoardListVo vo=new BoardListVo();
 				
 				Long no=rs.getLong(1);
 				String title=rs.getString(2);
@@ -60,14 +126,14 @@ public class BoardDao {
 				Long view_cnt=rs.getLong(5);
 				String reg_date=rs.getString(6);
 				
-				infolist.add(no);
-				infolist.add(title);
-				infolist.add(member_no);
-				infolist.add(member_name);
-				infolist.add(view_cnt);
-				infolist.add(reg_date);
+				vo.setNo(no);
+				vo.setTitle(title);
+				vo.setMember_no(member_no);
+				vo.setMember_name(member_name);
+				vo.setView_cnt(view_cnt);
+				vo.setReg_date(reg_date);
 				
-				writelist.add(infolist);
+				list.add(vo);
 				
 			}
 		} catch (SQLException e) {
@@ -84,9 +150,9 @@ public class BoardDao {
 			}
 		}
 		
-		return writelist;
+		return list;
 	}
-
+	
 	// 글쓰기
 	public void insert(BoardVo vo){
 		
@@ -174,7 +240,70 @@ public class BoardDao {
 			pstmt.executeUpdate();
 			
 		} catch (SQLException e) {
+			System.out.println("에러 - "+e);
+		} finally {
+			try {
+				
+				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	// 글수정
+	public void update(BoardVo vo){
+		
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			conn=getConnection();
+			String sql="update board set title=?, content=? where no=?";
+			pstmt=conn.prepareStatement(sql);
+			
+			pstmt.setString(1, vo.getTitle());
+			pstmt.setString(2, vo.getContent());
+			pstmt.setLong(3, vo.getNo());
+			
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
+			System.out.println("에러 - "+e);
+		} finally {
+			try {
+				
+				if (pstmt != null) pstmt.close();
+				if (conn != null) conn.close();
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+
+	// 조회수 증가
+	public void viewCount(Long no){
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		
+		try {
+			
+			conn=getConnection();
+			String sql="update board set view_cnt=view_cnt+1 where no=?";
+			pstmt=conn.prepareStatement(sql);
+			
+			pstmt.setLong(1, no);
+			
+			pstmt.executeUpdate();
+			
+		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		
 	}
 }

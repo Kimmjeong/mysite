@@ -5,41 +5,30 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import com.hanains.http.HttpUtil;
 import com.hanains.http.action.Action;
 import com.hanains.mysite.dao.BoardDao;
 import com.hanains.mysite.vo.BoardVo;
-import com.hanains.mysite.vo.UserVo;
 
-public class WriteAction implements Action {
+public class ModifyAction implements Action {
 
 	@Override
 	public void execute(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+		Long no=Long.parseLong(request.getParameter("no"));
 		String title=request.getParameter("title");
 		String content=request.getParameter("content");
 		
-		HttpSession session=request.getSession();
-		UserVo authUser=(UserVo) session.getAttribute("authUser");
-
-		if(authUser==null){
-			HttpUtil.redirect(response, "/mysite/board?a=list");
-			return;
-		}
-		
-		Long member_no=authUser.getNo();
-		
 		BoardVo vo=new BoardVo();
+		vo.setNo(no);
 		vo.setTitle(title);
 		vo.setContent(content);
-		vo.setMember_no(member_no);
 		
 		BoardDao dao=new BoardDao();
-		dao.insert(vo);
+		dao.update(vo);
 		
-		HttpUtil.redirect(response, "/mysite/board?a=list");
+		HttpUtil.redirect(response, "/mysite/board?a=view?no="+no);
 	}
 
 }
