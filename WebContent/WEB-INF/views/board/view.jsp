@@ -34,6 +34,13 @@
 				<div class="bottom">
 					<a href="/mysite/board?a=list">글목록</a>
 					<a href="/mysite/board?a=modifyform&no=${writing.no }">글수정</a>
+					
+					<form action="/mysite/board?a=writeform" method="post">
+						<input type="hidden" name="groupNo" value="${writing.group_no }"/>
+						<input type="hidden" name="orderNo" value="${writing.order_no }"/>
+						<input type="hidden" name="depth" value="${writing.depth}"/>
+						<input type="submit" value="답글"/>
+					</form>
 				</div>
 			</div>
 		</div>

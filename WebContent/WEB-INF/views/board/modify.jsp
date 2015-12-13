@@ -33,7 +33,7 @@
 						</tr>
 					</table>
 					<div class="bottom">
-						<a href="">취소</a>
+						<a href="/mysite/board?a=view&no=${writing.no }">취소</a>
 						<input type="submit" value="수정">
 					</div>
 				</form>				

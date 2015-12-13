@@ -23,7 +23,7 @@ public class GuestBookDao {
 		
 		// 연결하기(Oracle DB)
 		
-		String dbUrl="jdbc:oracle:thin:@localhost:1522:xe";
+		String dbUrl="jdbc:oracle:thin:@localhost:1521:xe";
 		connection=DriverManager.getConnection(dbUrl, "webdb","webdb");
 		
 		} catch (ClassNotFoundException e) {
@@ -155,7 +155,7 @@ public class GuestBookDao {
 	}
 
 	// 글쓴이 비밀번호 체크
-	public String isPassword(Long no){
+	public boolean isPassword(Long no, String password){
 		
 		Connection connection=null;
 		Statement stmt=null;
@@ -170,8 +170,12 @@ public class GuestBookDao {
 			stmt=connection.createStatement();
 			rs=stmt.executeQuery(sql);
 			
-			if(rs.next()) return rs.getString(1);
-			
+			if(rs.next()){ 
+				if(rs.getString(1).equals(password))
+					return true;
+				else
+					return false;
+			}
 			
 		} catch (SQLException e) {
 			System.out.println("에러 - "+e);
@@ -188,6 +192,6 @@ public class GuestBookDao {
 		}
 		
 		
-		return null;
+		return false;
 	}
 }

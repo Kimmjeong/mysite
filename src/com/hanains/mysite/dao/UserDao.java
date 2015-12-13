@@ -18,7 +18,7 @@ public class UserDao {
 			Class.forName( "oracle.jdbc.driver.OracleDriver" );
 		
 			//2.커넥션 만들기(ORACLE DB)
-			String dbURL  = "jdbc:oracle:thin:@localhost:1522:xe";
+			String dbURL  = "jdbc:oracle:thin:@localhost:1521:xe";
 			connection = DriverManager.getConnection( dbURL, "webdb", "webdb" );
 			
 		} catch( ClassNotFoundException ex ){

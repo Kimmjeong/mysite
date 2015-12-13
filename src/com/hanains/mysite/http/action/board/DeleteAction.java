@@ -1,6 +1,7 @@
 package com.hanains.mysite.http.action.board;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,17 +24,20 @@ public class DeleteAction implements Action {
 		HttpSession session=request.getSession();
 		UserVo authUser=(UserVo) session.getAttribute("authUser");
 		
-		if(authUser==null){
-			HttpUtil.redirect(response, "/mysite/board?a=list");
+		response.setContentType("text/html;charset=UTF-8");
+		PrintWriter out=response.getWriter();
+		
+		// 작성자 확인
+		if(authUser==null || authUser.getNo()!=writer_no){
+			out.print("<script>alert('작성자가 아닙니다.'); location.href ='/mysite/board?a=list'</script>");
+			out.flush();
+			out.close();
 			return;
 		}
-		Long member_no=authUser.getNo();
 		
 		BoardDao dao=new BoardDao();
-
-		if(writer_no==member_no)
-			dao.delete(no, writer_no);
-
+		dao.delete(no, writer_no);
+		
 		HttpUtil.redirect(response, "/mysite/board?a=list");
 		
 	}

@@ -25,6 +25,10 @@ public class ModifyAction implements Action {
 		vo.setTitle(title);
 		vo.setContent(content);
 		
+		System.out.println(no);
+		System.out.println(title);
+		System.out.println(content);
+		
 		BoardDao dao=new BoardDao();
 		dao.update(vo);
 		

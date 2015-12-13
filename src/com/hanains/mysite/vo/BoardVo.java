@@ -8,6 +8,28 @@ public class BoardVo {
 	private Long member_no;
 	private Long view_cnt;
 	private String reg_date;
+	private Long group_no;
+	private Long order_no;
+	private Long depth;
+	
+	public Long getGroup_no() {
+		return group_no;
+	}
+	public void setGroup_no(Long group_no) {
+		this.group_no = group_no;
+	}
+	public Long getOrder_no() {
+		return order_no;
+	}
+	public void setOrder_no(Long order_no) {
+		this.order_no = order_no;
+	}
+	public Long getDepth() {
+		return depth;
+	}
+	public void setDepth(Long depth) {
+		this.depth = depth;
+	}
 	public Long getNo() {
 		return no;
 	}

@@ -8,6 +8,22 @@ public class BoardListVo {
 	private String member_name;
 	private Long view_cnt;
 	private String reg_date;
+	private Long rnum;
+	private Long totcnt;
+	
+	public Long getRnum() {
+		return rnum;
+	}
+	public void setRnum(Long rnum) {
+		this.rnum = rnum;
+	}
+	public Long getTotcnt() {
+		return totcnt;
+	}
+	public void setTotcnt(Long totcnt) {
+		this.totcnt = totcnt;
+	}
+	
 	public Long getNo() {
 		return no;
 	}

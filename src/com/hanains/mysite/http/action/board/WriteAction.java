@@ -23,20 +23,41 @@ public class WriteAction implements Action {
 		
 		HttpSession session=request.getSession();
 		UserVo authUser=(UserVo) session.getAttribute("authUser");
-
-		if(authUser==null){
-			HttpUtil.redirect(response, "/mysite/board?a=list");
-			return;
-		}
-		
 		Long member_no=authUser.getNo();
+		
+		BoardDao dao=new BoardDao();
+		
+		Long groupNo=-1L;
+		Long orderNo=-1L;
+		Long depth=0L;
+		
+		// 새글
+		if (request.getParameter("groupNo").equals("") && request.getParameter("orderNo").equals("") && request.getParameter("depth").equals("")) {
+			groupNo = dao.getGroupNo()+1;
+			System.out.println(groupNo); 
+			orderNo = 1L;
+			depth = 0L;
+			
+		} else { // 답글
+			
+			Long parentOrderNo = Long.parseLong(request.getParameter("orderNo"));
+			Long parentDepth = Long.parseLong(request.getParameter("depth"));
+			
+			groupNo = Long.parseLong(request.getParameter("groupNo"));
+			orderNo = parentOrderNo + 1;
+			depth = parentDepth + 1;
+			
+			dao.updateOrderNo(orderNo);
+		}
 		
 		BoardVo vo=new BoardVo();
 		vo.setTitle(title);
 		vo.setContent(content);
 		vo.setMember_no(member_no);
+		vo.setGroup_no(groupNo);
+		vo.setOrder_no(orderNo);
+		vo.setDepth(depth);
 		
-		BoardDao dao=new BoardDao();
 		dao.insert(vo);
 		
 		HttpUtil.redirect(response, "/mysite/board?a=list");

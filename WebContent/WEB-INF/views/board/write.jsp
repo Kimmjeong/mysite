@@ -36,6 +36,10 @@
 						<a href="/mysite/board">취소</a>
 						<input type="submit" value="등록">
 					</div>
+					
+					<input type="hidden" name="groupNo" value="${groupNo}" />
+					<input type="hidden" name="orderNo" value="${orderNo}" />
+					<input type="hidden" name="depth" value="${depth}" />
 				</form>				
 			</div>
 		</div>
